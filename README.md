@@ -191,38 +191,64 @@ angular.module('devMtIn')
 .controller('homeCtrl', function($scope, profileService) {
 //…
 ```
-We can now access our `serviceTest` function by simply prefixing the function name with the name of our service and invoking it, `profileService.serviceTest()`. Once you refresh the page you should see the message inside of your console.
+We can now access our `serviceTest` function by simply prefixing the function name with the 
+name of our service and invoking it, `profileService.serviceTest()`. Once you refresh the page 
+you should see the message inside of your console.
 
 ### Step Two: ng-click
-Yesterday we started with some basic user interactivity using `ng-model` and `ng-options`. Today we're going to go further by introducing `ng-click`, Angular's built in click handler directive.
+Yesterday we started with some basic user interactivity using `ng-model` and `ng-options`. 
+Today we're going to go further by introducing `ng-click`, Angular's built in click handler directive.
 
-For our first `ng-click` we'll start with a simple expression that disables profile editing unless the editing button is clicked. Begin by creating `$scope.editing` in your homeCtrl and setting its value to `false`.
+For our first `ng-click` we'll start with a simple expression that disables profile editing 
+unless the editing button is clicked. Begin by creating `$scope.editing` in your homeCtrl 
+and setting its value to `false`.
 
-To disable our form fields we need to use another built-in Angular directive, `ng-disabled`. `ng-disabled` simply evaluates the expression passed to it and disables its containing element based on the *truthiness* or *falsiness* of the expression. Add `ng-disabled` as an attribute to the three profile inputs and pass them `!editing`. Once you refresh the page the profile form fields should now be disabled.
+To disable our form fields we need to use another built-in Angular directive, `ng-disabled`. 
+`ng-disabled` simply evaluates the expression passed to it and disables its containing element
+ based on the *truthiness* or *falsiness* of the expression. Add `ng-disabled` as an attribute 
+ to the three profile inputs and pass them `!editing`. Once you refresh the page the profile 
+ form fields should now be disabled.
 
-Now that we have our `ng-disabled` working, we just need to flip the value of `editing` anytime a user clicks on the editing button. To do this we need to add the `ng-click` attribute to our 'Editing' button and pass it `editing = !editing`. One last step for clarity: we should display the value of `editing` inside of the 'Editing' button to make it clear whether or not editing is active.
+Now that we have our `ng-disabled` working, we just need to flip the value of `editing` anytime 
+a user clicks on the editing button. To do this we need to add the `ng-click` attribute to our 
+'Editing' button and pass it `editing = !editing`. One last step for clarity: we should display 
+the value of `editing` inside of the 'Editing' button to make it clear whether or not editing is active.
 
-Once that is complete you should be able to lock and unlock the profile fields, displaying whether or not they are editable in the 'Editing' button.
+Once that is complete you should be able to lock and unlock the profile fields, displaying whether 
+or not they are editable in the 'Editing' button.
 
 ### Step Three: Saving to local storage
-The next step will be to set up local storage, letting our profiles persist between refreshes. We'll start in the html and work back to the service.
+The next step will be to set up local storage, letting our profiles persist between refreshes. 
+We'll start in the html and work back to the service.
 
-The first thing we need to do is add `ng-model`s to the rest of our profile fields. Make sure these `ng-model`'s point to new properties on the `myProfile` object. Next, we will need an `ng-click` on the profile's 'Save' button. This `ng-cick` should invoke a function we will create on our controller named `saveProfile` and pass it `myProfile` as the only argument. This is all we need in our HTML. Next step: controller.
+The first thing we need to do is add `ng-model`s to the rest of our profile fields. Make sure
+ these `ng-model`'s point to new properties on the `myProfile` object. Next, we will need an `ng-click` 
+ on the profile's 'Save' button. This `ng-cick` should invoke a function we will create on our 
+ controller named `saveProfile` and pass it `myProfile` as the only argument. This is all we need
+  in our HTML. Next step: controller.
 
-In `homeCtrl.js` create the `saveProfile` function and make sure it accepts a `profile` parameter. This function should simply call `profileService.saveProfile`, passing in the `profile` parameter as an argument, then set `$scope.editing` to false. It may seem odd to have a function who's only job is to pass data from the view to a service, but remember that the primary use of controllers is to act as a sort of middle-man. Controllers exist to communicate between the view and the services.
+In `homeCtrl.js` create the `saveProfile` function and make sure it accepts a `profile` parameter.
+ This function should simply call `profileService.saveProfile`, passing in the `profile` parameter
+  as an argument, then set `$scope.editing` to false. It may seem odd to have a function who's 
+  only job is to pass data from the view to a service, but remember that the primary use of controllers
+   is to act as a sort of middle-man. Controllers exist to communicate between the view and the services.
 
-We now need to create a `saveProfile` function inside of `profileService`. This function should also take a `profile` parameter and save that profile object to local storage. The function will look something like this:
+We now need to create a `saveProfile` function inside of `profileService`. This function should 
+also take a `profile` parameter and save that profile object to local storage. The function will 
+look something like this:
 ```javascript
 this.saveProfile = function(profile) {
   localStorage.setItem('profile', JSON.stringify(profile));
 }
 ```
-To make sure this is working enter `console.log(localStorage.profile)` in your browser's console. You should see your profile information print to console, even after refreshing.
+To make sure this is working enter `console.log(localStorage.profile)` in your browser's console. 
+You should see your profile information print to console, even after refreshing.
 
 ### Step Four: Retrieving from local storage.
 Our profile is saving, but isn't yet returning to the view on page reloads. Let's fix that.
 
-To start, we'll create a new function inside of `profileService.js` named `checkForProfile`. This function will check local storage and return the profile if it exists, otherwise returning a default friends list.
+To start, we'll create a new function inside of `profileService.js` named `checkForProfile`. This 
+function will check local storage and return the profile if it exists, otherwise returning a default friends list.
 ```javascript
 this.checkForProfile = function() {
   if (localStorage.getItem('profile')) {
@@ -233,14 +259,20 @@ this.checkForProfile = function() {
   }
 }
 ```
-Now inside of `homeCtrl.js` instead of setting `$scope.myProfile` equal to a friends list, we can set it equal to `profileService.checkForProfile()`. Now your profile should load automatically on page refresh.
+Now inside of `homeCtrl.js` instead of setting `$scope.myProfile` equal to a friends list, we can set
+ it equal to `profileService.checkForProfile()`. Now your profile should load automatically on page refresh.
 
 ### Step Five: Deleting from local storage.
-The last step for today will be adding functionality to our delete button. This will follow the same basic steps as adding to local storage.
+The last step for today will be adding functionality to our delete button. This will follow the same 
+basic steps as adding to local storage.
 
-Add an `ng-click` to the 'Delete' button that calls a `deleteProfile` function inside of our controller. Our controller should call a `profileService.deleteProfile` function that simply removes the profile from local storage (`localStorage.removeItem('profile')`). After deleting the profile, we need to get our basic friends list back, so set `$scope.myProfile` equal to `profileService.checkForProfile()` again.
+Add an `ng-click` to the 'Delete' button that calls a `deleteProfile` function inside of our controller. 
+Our controller should call a `profileService.deleteProfile` function that simply removes the profile 
+from local storage (`localStorage.removeItem('profile')`). After deleting the profile, we need to get 
+our basic friends list back, so set `$scope.myProfile` equal to `profileService.checkForProfile()` again.
 
-You've completed Angular day two! Now you know how to create services, access services inside of your controllers, handle clicks, and save to local storage.
+You've completed Angular day two! Now you know how to create services, access services inside of your
+ controllers, handle clicks, and save to local storage.
 
 --------
 
